@@ -80,6 +80,8 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
         mobilnost = (100 * brojMogucihPotezaMaksimizer) / (brojMogucihPotezaMaksimizer + brojMogucihPotezaMinimizer)
     elif brojMogucihPotezaMinimizer > brojMogucihPotezaMaksimizer:
         mobilnost = -(100* brojMogucihPotezaMinimizer) / (brojMogucihPotezaMaksimizer + brojMogucihPotezaMinimizer)
+    else:
+        mobilnost = 0
 
 
     return 10 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet
