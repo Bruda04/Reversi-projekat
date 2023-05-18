@@ -85,15 +85,18 @@ class Reversi(object):
         mozeDesno = False
         obrnutiDesno = []
         for i in range(col+1, 8 , 1):
-            if tabla[row][i] == protivnik:
+            if tabla[row][i] == protivnik and i != 7:
                 obrnutiDesno.append((row, i))
                 mozeDesno = True
-            if tabla[row][i] == igrac and len(obrnutiDesno) >= 1:
+            elif tabla[row][i] == igrac and len(obrnutiDesno) >= 1:
                 mozeDesno = True
                 break
             elif tabla[row][i] != protivnik and tabla[row][i] != igrac:
                 mozeDesno = False
                 break
+            else:
+                mozeDesno = False
+                break 
         if mozeDesno:
             zaObrtanje.extend(obrnutiDesno)
 
@@ -101,15 +104,18 @@ class Reversi(object):
         mozeLevo = False
         obrnutiLevo = []
         for i in range(col-1, 0-1, -1):
-            if tabla[row][i] == protivnik:
+            if tabla[row][i] == protivnik and i != 0:
                 obrnutiLevo.append((row, i))
                 mozeLevo = True
-            if tabla[row][i] == igrac and len(obrnutiLevo) >= 1:
+            elif tabla[row][i] == igrac and len(obrnutiLevo) >= 1:
                 mozeLevo = True
                 break
             elif tabla[row][i] != protivnik and tabla[row][i] != igrac:
                 mozeLevo = False
                 break
+            else:
+                mozeLevo = False
+                break 
         if mozeLevo:
             zaObrtanje.extend(obrnutiLevo)
         
@@ -117,7 +123,7 @@ class Reversi(object):
         mozeDole = False
         obrnutiDole = []
         for i in range(row+1, 8, 1):
-            if tabla[i][col] == protivnik:
+            if tabla[i][col] == protivnik and i != 7:
                 obrnutiDole.append((i, col))
                 mozeDole = True
             elif tabla[i][col] == igrac and len(obrnutiDole) >= 1:
@@ -126,6 +132,9 @@ class Reversi(object):
             elif tabla[i][col] != protivnik and tabla[i][col] != igrac:
                 mozeDole = False
                 break
+            else:
+                mozeDole = False
+                break 
         if mozeDole:
             zaObrtanje.extend(obrnutiDole)
 
@@ -133,7 +142,7 @@ class Reversi(object):
         mozeGore = False
         obrnutiGore = []
         for i in range(row-1, 0-1, -1):
-            if tabla[i][col] == protivnik:
+            if tabla[i][col] == protivnik and i != 0:
                 obrnutiGore.append((i, col))
                 mozeGore = True
             elif tabla[i][col] == igrac and len(obrnutiGore) >= 1:
@@ -142,82 +151,97 @@ class Reversi(object):
             elif tabla[i][col] != protivnik and tabla[i][col] != igrac:
                 mozeGore = False
                 break
+            else:
+                mozeGore = False
+                break 
         if mozeGore:
             zaObrtanje.extend(obrnutiGore)
 
         #provera desno-dole:
         mozeDesnoDole = False
         obrnutiDesnoDole = []
-        for i in range(1, (min(8 - (col + 1), 8 - (row + 1))), 1):
+        for i in range(1, (min(8 - (col + 1), 8 - (row + 1)) + 1), 1):
             x = col + i
             y = row + i
             
-            if tabla[y][x] == protivnik:
+            if tabla[y][x] == protivnik and x != 7 and y != 7:
                 obrnutiDesnoDole.append((y, x))
                 mozeDesnoDole = True
-            if tabla[y][x] == igrac and len(obrnutiDesnoDole) >= 1:
+            elif tabla[y][x] == igrac and len(obrnutiDesnoDole) >= 1:
                 mozeDesnoDole = True
                 break
             elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
                 mozeDesnoDole = False
                 break
+            else:
+                mozeDesnoDole = False
+                break 
         if mozeDesnoDole:
             zaObrtanje.extend(obrnutiDesnoDole)
         
         #provera desno-gore:
         mozeDesnoGore = False
         obrnutiDesnoGore = []
-        for i in range(1, (min(8 - (col + 1), row)), 1):
+        for i in range(1, (min(8 - (col + 1), row) + 1), 1):
             x = col + i
             y = row - i
 
-            if tabla[y][x] == protivnik:
+            if tabla[y][x] == protivnik and x != 7 and y != 0:
                 obrnutiDesnoGore.append((y, x))
                 mozeDesnoGore = True
-            if tabla[y][x] == igrac and len(obrnutiDesnoGore) >= 1:
+            elif tabla[y][x] == igrac and len(obrnutiDesnoGore) >= 1:
                 mozeDesnoGore = True
                 break
             elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
                 mozeDesnoGore = False
                 break
+            else:
+                mozeDesnoGore = False
+                break 
         if mozeDesnoGore:
             zaObrtanje.extend(obrnutiDesnoGore)
 
         #provera levo-dole:
         mozeLevoDole = False
         obrnutiLevoDole = []
-        for i in range(1, (min(col, 8 - (row + 1))), 1):
+        for i in range(1, (min(col, 8 - (row + 1)) + 1), 1):
             x = col - i
             y = row + i
             
-            if tabla[y][x] == protivnik:
+            if tabla[y][x] == protivnik and x != 0 and y != 7:
                 obrnutiLevoDole.append((y, x))
                 mozeLevoDole = True
-            if tabla[y][x] == igrac and len(obrnutiLevoDole) >= 1:
+            elif tabla[y][x] == igrac and len(obrnutiLevoDole) >= 1:
                 mozeLevoDole = True
                 break
             elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
                 mozeLevoDole = False
                 break
+            else:
+                mozeLevoDole = False
+                break 
         if mozeLevoDole:
             zaObrtanje.extend(obrnutiLevoDole)
 
         #provera levo-gore:
         mozeLevoGore = False
         obrnutiLevoGore = []
-        for i in range(1, (min(col, row)), 1):
+        for i in range(1, (min(col, row) + 1), 1):
             x = col - i
             y = row - i
 
-            if tabla[y][x] == protivnik:
+            if tabla[y][x] == protivnik and x != 0 and y != 0:
                 obrnutiLevoGore.append((y, i))
                 mozeLevoGore = True
-            if tabla[y][x] == igrac and len(obrnutiLevoGore) >= 1:
+            elif tabla[y][x] == igrac and len(obrnutiLevoGore) >= 1:
                 mozeLevoGore = True
                 break
             elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
                 mozeLevoGore = False
                 break
+            else:
+                mozeLevoGore = False
+                break 
         if mozeLevoGore:
             zaObrtanje.extend(obrnutiLevoGore)
 
@@ -265,7 +289,8 @@ class Reversi(object):
             maximalanaEvaluacija = -99999
             moguciPoteziBota = self.izracunajMogucePoteze(tabla, self._bot)
             for (i, j) in moguciPoteziBota:
-                novaTabla = self.postaviBota(tabla, i, j, moguciPoteziBota[(i ,j)])
+                tablaCopy = copy.deepcopy(tabla)
+                novaTabla = self.postaviBota(tablaCopy, i, j, moguciPoteziBota[(i ,j)])
                 if zaOdigrati == None:
                     zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, False, (i, j))
                 else:
@@ -277,7 +302,8 @@ class Reversi(object):
             minimalnaEvaluacija = 99999
             moguciPoteziIgraca = self.izracunajMogucePoteze(tabla, self._igrac)
             for (i, j) in moguciPoteziIgraca:
-                novaTabla = self.postaviIgraca(tabla, i, j, moguciPoteziIgraca[(i, j)])
+                tablaCopy = copy.deepcopy(tabla)
+                novaTabla = self.postaviIgraca(tablaCopy, i, j, moguciPoteziIgraca[(i, j)])
                 zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, True, zaOdigrati)
                 minimalnaEvaluacija = min(minimalnaEvaluacija, evaluacijaSituacije)
             return (zaOdigrati, minimalnaEvaluacija)
