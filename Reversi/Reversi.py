@@ -1,5 +1,5 @@
 from Heuristics.Heuristika import calculateHeuristics
-import os, copy
+import os, copy, time
 
 class Reversi(object):
     def __init__(self, player):
@@ -272,8 +272,8 @@ class Reversi(object):
         else:
             return False
     
-    def minmax(self, tabla, dubina, igraBot, zaOdigrati):
-        if dubina == 0 or self.isKraj(tabla):
+    def minmax(self, tabla, dubina, igraBot, zaOdigrati, alpha, beta, vreme):
+        if dubina == 0 or self.isKraj(tabla) or (time.time() - vreme) >= 3:
             hashTable = str(tabla)
             if hashTable in self._sracunateHeuristike:
                 return (zaOdigrati, self._sracunateHeuristike[hashTable])
@@ -292,10 +292,13 @@ class Reversi(object):
                 tablaCopy = copy.deepcopy(tabla)
                 novaTabla = self.postaviBota(tablaCopy, i, j, moguciPoteziBota[(i ,j)])
                 if zaOdigrati == None:
-                    zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, False, (i, j))
+                    zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, False, (i, j), alpha, beta, vreme)
                 else:
-                    zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, False, zaOdigrati)
+                    zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, False, zaOdigrati, alpha, beta, vreme)
                 maximalanaEvaluacija = max(maximalanaEvaluacija, evaluacijaSituacije)
+                alpha = max(alpha, evaluacijaSituacije)
+                if beta <= alpha:
+                    break
             return (zaOdigrati, maximalanaEvaluacija)
         
         else:
@@ -304,15 +307,18 @@ class Reversi(object):
             for (i, j) in moguciPoteziIgraca:
                 tablaCopy = copy.deepcopy(tabla)
                 novaTabla = self.postaviIgraca(tablaCopy, i, j, moguciPoteziIgraca[(i, j)])
-                zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, True, zaOdigrati)
+                zaOdigrati, evaluacijaSituacije = self.minmax(novaTabla, dubina - 1, True, zaOdigrati, alpha, beta, vreme)
                 minimalnaEvaluacija = min(minimalnaEvaluacija, evaluacijaSituacije)
+                beta = min(beta, evaluacijaSituacije)
+                if beta <= alpha:
+                    break
             return (zaOdigrati, minimalnaEvaluacija)
 
     def igracPotez(self):
         self.azurirajMogucePotezeIgraca()
 
         if len(self._tablaMogucihPoteza) == 0:
-            self._kraj = True
+            # self._kraj = True
             return
 
         self.prikazTable()
@@ -329,6 +335,8 @@ class Reversi(object):
             unos = int(input("Unesite zeljeni potez: ")) - 1
             if unos >= 0 and unos < len(ponudaPoteza):
                 validanUnos = True
+            else:
+                print("Niste uneli validnu opciju!")
         odabraniPotez = ponudaPoteza[unos]
         trenutnaTabla = copy.deepcopy(self._tabla)
         zaObrtanje = self._tablaMogucihPoteza[odabraniPotez]
@@ -340,11 +348,11 @@ class Reversi(object):
     def botPotez(self):
         moguciPoteziBota = self.izracunajMogucePoteze(self._tabla, self._bot)
         if len(moguciPoteziBota) == 0:
-            self._kraj = True
+            # self._kraj = True
             return
         
         trenutnaTabla = copy.deepcopy(self._tabla)
-        najboljiPotez = self.minmax(trenutnaTabla, 4, True, None)[0]
+        najboljiPotez = self.minmax(trenutnaTabla, 4, True, None, -99999, 99999, time.time())[0]
 
         zaObrtanje = moguciPoteziBota[najboljiPotez]
         self._tabla = self.postaviBota(self._tabla ,najboljiPotez[0], najboljiPotez[1], zaObrtanje)
@@ -354,7 +362,7 @@ class Reversi(object):
         self.prikazTable()
     
     def igraj(self):
-        while self._kraj != True:
+        while self.isKraj(self._tabla) != True:
             self.igracPotez()
             self.botPotez()
 
