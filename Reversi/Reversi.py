@@ -9,9 +9,6 @@ class Reversi(object):
             self._igrac = -1
             self._bot = 1
 
-        self._igracPoteza = 0
-        self._botPoteza = 0
-
         self._igracScore = 2
         self._botScore = 2
 
@@ -22,21 +19,17 @@ class Reversi(object):
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, 1, -1, None, None, None],    #None = prazno, 1 = Black, -1 = White
-                [None, None, None, -1, 1, -1, None, None],
-                [None, None, None, None, None, None, None, None],
-                [None, None, None, None, None, None, None, None],
-                [None, None, None, None, None, None, None, None],
-                ]
-        self._tablaMogucihPoteza = [
-                [None, None, None, None, None, None, None, None],
-                [None, None, None, None, None, None, None, None],
                 [None, None, None, -1, 1, None, None, None],
-                [None, None, -1, None, None, 1, None, None],
-                [None, None, 1, None, None, -1, None, None],    #None = prazno, 1 = Black, -1 = White
-                [None, None, None, 1, -1, None, None, None],
+                [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 ]
+        
+        self._tablaMogucihPoteza = {}
+
+        self._naPotezu = self._igrac
+
+        self._sracunateHeuristike = {}
         
     
     def prikazTable(self):
@@ -53,7 +46,7 @@ class Reversi(object):
                     case None: prntCol.append("\u2b1a")
                     case 1: prntCol.append("B")
                     case -1: prntCol.append("W")
-                if (self._tablaMogucihPoteza[i][j] == self._igrac):
+                if ((i, j) in self._tablaMogucihPoteza):
                     prntCol[j] = "X"
                     
             print()
@@ -62,14 +55,22 @@ class Reversi(object):
         print ("\n{:^7} {:^7} {:^7} {:^7} {:^7} {:^7} {:^7} {:^7} {:^7}".format('', 'A','B','C','D','E','F','G','H'))
 
     
-    def postaviIgraca(self, tabla, row, col):
+    def postaviIgraca(self, tabla, row, col, zaObrtanje):
+        self._igracScore +=1 + len(zaObrtanje)
+        self._botScore -= len(zaObrtanje)
         rettabla = tabla
         rettabla[row][col] = self._igrac
+        for (i, j) in zaObrtanje:
+            rettabla[i][j] = self._igrac
         return rettabla
     
-    def postaviBota(self, tabla, row, col):
+    def postaviBota(self, tabla, row, col, zaObrtanje):
+        self._botScore += 1 + len(zaObrtanje)
+        self._igracScore -= len(zaObrtanje)
         rettabla = tabla
         rettabla[row][col] = self._bot
+        for (i, j) in zaObrtanje:
+            rettabla[i][j] = self._bot
         return rettabla
     
     def isLegalanPotez(slef, tabla, row, col, igrac):
@@ -149,68 +150,76 @@ class Reversi(object):
         #provera desno-dole:
         mozeDesnoDole = False
         obrnutiDesnoDole = []
-        for i in range(col+1, 8 , 1):
-            for j in range(row+1, 8, 1):
-                if tabla[j][i] == protivnik:
-                    obrnutiDesnoDole.append((j, i))
-                    mozeDesnoDole = True
-                if tabla[j][i] == igrac and len(obrnutiDesnoDole) >= 1:
-                    mozeDesnoDole = True
-                    break
-                elif tabla[j][i] != protivnik and tabla[j][i] != igrac:
-                    mozeDesnoDole = False
-                    break
+        for i in range(1, (min(8 - (col + 1), 8 - (row + 1))), 1):
+            x = col + i
+            y = row + i
+            
+            if tabla[y][x] == protivnik:
+                obrnutiDesnoDole.append((y, x))
+                mozeDesnoDole = True
+            if tabla[y][x] == igrac and len(obrnutiDesnoDole) >= 1:
+                mozeDesnoDole = True
+                break
+            elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
+                mozeDesnoDole = False
+                break
         if mozeDesnoDole:
             zaObrtanje.append(obrnutiDesnoDole)
         
         #provera desno-gore:
         mozeDesnoGore = False
         obrnutiDesnoGore = []
-        for i in range(col+1, 8 , 1):
-            for j in range(row-1, 0-1, -1):
-                if tabla[j][i] == protivnik:
-                    obrnutiDesnoGore.append((j, i))
-                    mozeDesnoGore = True
-                if tabla[j][i] == igrac and len(obrnutiDesnoGore) >= 1:
-                    mozeDesnoGore = True
-                    break
-                elif tabla[j][i] != protivnik and tabla[j][i] != igrac:
-                    mozeDesnoGore = False
-                    break
+        for i in range(1, (min(8 - (col + 1), row)), 1):
+            x = col + i
+            y = row - i
+
+            if tabla[y][x] == protivnik:
+                obrnutiDesnoGore.append((y, x))
+                mozeDesnoGore = True
+            if tabla[y][x] == igrac and len(obrnutiDesnoGore) >= 1:
+                mozeDesnoGore = True
+                break
+            elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
+                mozeDesnoGore = False
+                break
         if mozeDesnoGore:
             zaObrtanje.append(obrnutiDesnoGore)
 
         #provera levo-dole:
         mozeLevoDole = False
         obrnutiLevoDole = []
-        for i in range(col-1, 0-1, -1):
-            for j in range(row+1, 8, 1):
-                if tabla[j][i] == protivnik:
-                    obrnutiLevoDole.append((j, i))
-                    mozeLevoDole = True
-                if tabla[j][i] == igrac and len(obrnutiLevoDole) >= 1:
-                    mozeLevoDole = True
-                    break
-                elif tabla[j][i] != protivnik and tabla[j][i] != igrac:
-                    mozeLevoDole = False
-                    break
+        for i in range(1, (min(col, 8 - (row + 1))), 1):
+            x = col - i
+            y = row + i
+            
+            if tabla[y][x] == protivnik:
+                obrnutiLevoDole.append((y, x))
+                mozeLevoDole = True
+            if tabla[y][x] == igrac and len(obrnutiLevoDole) >= 1:
+                mozeLevoDole = True
+                break
+            elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
+                mozeLevoDole = False
+                break
         if mozeLevoDole:
             zaObrtanje.append(obrnutiLevoDole)
 
         #provera levo-gore:
         mozeLevoGore = False
         obrnutiLevoGore = []
-        for i in range(col-1, 0-1, -1):
-            for j in range(row-1, 0-1, -1):
-                if tabla[j][i] == protivnik:
-                    obrnutiLevoGore.append((j, i))
-                    mozeLevoGore = True
-                if tabla[j][i] == igrac and len(obrnutiLevoGore) >= 1:
-                    mozeLevoGore = True
-                    break
-                elif tabla[j][i] != protivnik and tabla[j][i] != igrac:
-                    mozeLevoGore = False
-                    break
+        for i in range(1, (min(col, row)), 1):
+            x = col - i
+            y = row - i
+
+            if tabla[y][x] == protivnik:
+                obrnutiLevoGore.append((y, i))
+                mozeLevoGore = True
+            if tabla[y][x] == igrac and len(obrnutiLevoGore) >= 1:
+                mozeLevoGore = True
+                break
+            elif tabla[y][x] != protivnik and tabla[y][x] != igrac:
+                mozeLevoGore = False
+                break
         if mozeLevoGore:
             zaObrtanje.append(obrnutiLevoGore)
 
@@ -218,29 +227,68 @@ class Reversi(object):
             return True, zaObrtanje
         else:
             return False, None
-        
-    def azurirajMogucePoteze(self):
-        for i in range(8):
-            for j in range(8):
-                potezIgrac, obrtanjeIgrac = self.isLegalanPotez(self._tabla, i, j, self._igrac)
-                potezBot, obrtanjeBot = self.isLegalanPotez(self._tabla, i, j, self._bot)
-                if potezIgrac:
-                    print("ddaaa")
-                    self._tablaMogucihPoteza[i][j] = self._igrac
-                elif potezBot:
-                    print("ddaaa")
-                    self._tablaMogucihPoteza[i][j] = self._bot
-                else:
-                    self._tablaMogucihPoteza[i][j] = None
-
-    def _isKraj(self, tabelaMogucihPoteza):
-        kraj = True
-        for i in range(8):
-            for j in range(8):
-                if tabelaMogucihPoteza[i][j] != None:
-                    kraj = False
-                    break
-        return kraj
     
-    def minmax():
-        pass
+    def izracunajMogucePoteze(self, tabla, igrac):
+        retTabla = {}
+        for i in range(8):
+            for j in range(8):
+                legalan, zaObrtanje = self.isLegalanPotez(tabla, i, j, igrac)
+                if legalan:
+                    retTabla[(i, j)] = zaObrtanje
+
+        return retTabla
+
+    def azurirajMogucePotezeIgraca(self):
+        self._tablaMogucihPoteza = self.izracunajMogucePoteze(self._tabla, self._igrac)
+        
+
+    def isKraj(self, tabla):
+        brojPotezaIgrac = len(self.izracunajMogucePoteze(tabla, self._igrac))
+        brojPotezaBot = len(self.izracunajMogucePoteze(tabla, self._bot))
+        if brojPotezaBot == 0 and brojPotezaIgrac == 0:
+            return True
+        else:
+            return False
+    
+    def minmax(self, tabla, dubina, igraBot):
+        if dubina == 0 or self.isKraj(tabla):
+            hashTable = str(tabla)
+            if hashTable in self._sracunateHeuristike:
+                return self._sracunateHeuristike[hashTable]
+            else:
+                if igraBot:
+                    vrednostHeuristike = calculateHeuristics(tabla, self.izracunajMogucePoteze(tabla, self._bot), self.izracunajMogucePoteze(tabla, self._igrac), self._bot, self._igrac)
+                else:
+                    vrednostHeuristike = calculateHeuristics(tabla, self.izracunajMogucePoteze(tabla, self._igrac), self.izracunajMogucePoteze(tabla, self._bot), self._igrac, self._bot)
+                self._sracunateHeuristike[hashTable] = vrednostHeuristike
+                return vrednostHeuristike
+
+        if igraBot:
+            maximalanaEvaluacija = -99999
+            moguciPoteziBota = self.izracunajMogucePoteze(tabla, self._bot)
+            for potez in moguciPoteziBota:
+                novaTabla = self.postaviBota(tabla, potez[0], potez[1], moguciPoteziBota[potez])
+                evaluacijaSituacije = self.minmax(novaTabla, dubina-1, False)
+                maximalanaEvaluacija = max(maximalanaEvaluacija, evaluacijaSituacije)
+            return maximalanaEvaluacija
+        
+        else:
+            minimalnaEvaluacija = 99999
+            moguciPoteziIgraca = self.izracunajMogucePoteze(tabla, self._igrac)
+            for potez in moguciPoteziIgraca:
+                novaTabla = self.postaviIgraca(tabla, potez[0], potez[1], moguciPoteziIgraca[potez])
+                evaluacijaSituacije = self.minmax(novaTabla, dubina-1, True)
+                minimalnaEvaluacija = min(minimalnaEvaluacija, evaluacijaSituacije)
+            return minimalnaEvaluacija
+
+
+if __name__ == "__main__":
+    igra = Reversi(1)
+    while not igra.isKraj(igra._tabla):
+        igra.azurirajMogucePotezeIgraca()
+        igra.prikazTable()
+        igra._tabla = igra.postaviIgraca(igra._tabla, 2, 4, [(3,4)])
+        igra._tablaMogucihPoteza = igra.izracunajMogucePoteze(igra._tabla, igra._bot)
+        igra.prikazTable()
+
+        break
