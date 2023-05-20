@@ -6,6 +6,11 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
     maksimizerStabilnost = 0
     minimizerStabilnost = 0
     kvalitet = 0
+    maksimizerBlizinaUglova = 0
+    minimizerBlizinaUglova = 0
+
+    vrednostX = [-1, -1, 0, 1, 1, 1, 0, -1]
+    vrednostY = [0, 1, 1, 1, 0, -1, -1, -1]
 
     kvalitetPolja = [
         [20, -3, 11, 8, 8, 11, -3, 20],
@@ -25,16 +30,7 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
                 kvalitet += kvalitetPolja[i][j]
                 if (i == 7 or i == 0) and (j == 0 or j == 7):
                     maksimizerUglova += 1
-                    maksimizerStabilnost += 1
-                    continue
                     
-                if ((j<7 and tabla[i][j+1] == minimizer ) or 
-                    (i<7 and tabla[i+1][j] == minimizer) or 
-                    (i<7 and j<7 and tabla[i+1][j+1] == minimizer) or
-                    (j>0 and tabla[i][j-1] == minimizer) or 
-                    (i>0 and tabla[i-1][j] == minimizer) or 
-                    (i>0 and j>0 and tabla[i-1][j-1] == minimizer)):
-                    maksimizerStabilnost -= 1
 
 
             elif tabla[i][j] == minimizer:
@@ -42,16 +38,19 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
                 kvalitet -= kvalitetPolja[i][j]
                 if (i == 7 or i == 0) and (j == 0 or j == 7):
                     minimizerUglova += 1
-                    minimizerStabilnost += 1
-                    continue
+                                        
 
-                if ((j<7 and tabla[i][j+1] == maksimizer ) or 
-                    (i<7 and tabla[i+1][j] == maksimizer) or 
-                    (i<7 and j<7 and tabla[i+1][j+1] == maksimizer) or
-                    (j>0 and tabla[i][j-1] == maksimizer) or 
-                    (i>0 and tabla[i-1][j] == maksimizer) or 
-                    (i>0 and j>0 and tabla[i-1][j-1] == maksimizer)):
-                    minimizerStabilnost -= 1
+            elif tabla[i][j] != None:
+                for k in range(8):
+                    x = i + vrednostX[k]
+                    y = j + vrednostY[k]
+                    if (x >= 0 and x < 8  and y >= 0 and y < 8 and tabla[x][y] == None):
+                        if tabla[i][j] == maksimizer:
+                            maksimizerStabilnost += 1
+                        else:
+                            minimizerStabilnost += 1
+                        break
+
 
     #Razlika zetona
     if maksimizerZetoni > minimizerZetoni:
@@ -63,15 +62,76 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
 
     #Stabilnost
     if maksimizerStabilnost > minimizerStabilnost:
-        stabilnost = (100 * maksimizerStabilnost) / (maksimizerStabilnost + minimizerStabilnost)
+        stabilnost = -(100 * maksimizerStabilnost) / (maksimizerStabilnost + minimizerStabilnost)
     elif minimizerStabilnost > maksimizerStabilnost:
-        stabilnost = -(100 * minimizerStabilnost) / (maksimizerStabilnost + minimizerStabilnost)
+        stabilnost = (100 * minimizerStabilnost) / (maksimizerStabilnost + minimizerStabilnost)
     else:
         stabilnost = 0
 
-
-    #Uglovi zauzeti
+    # Uglovi zauzeti
     uglovi = 25 * (maksimizerUglova - minimizerUglova)
+
+    #Blizina uglovima
+    if tabla[0][0] != maksimizer and tabla[0][0] != minimizer:
+        if tabla[0][1] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[0][1] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[1][1] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[1][1] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[1][0] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[1][0] == minimizer:
+            minimizerBlizinaUglova += 1
+
+    if tabla[0][7] != maksimizer and tabla[0][7] != minimizer:
+        if tabla[0][6] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[0][6] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[1][6] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[1][6] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[1][7] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[1][7] == minimizer:
+            minimizerBlizinaUglova += 1
+    
+    if tabla[7][0] != maksimizer and tabla[7][0] != minimizer:
+        if tabla[7][1] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[7][1] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[6][1] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[6][1] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[6][0] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[6][0] == minimizer:
+            minimizerBlizinaUglova += 1
+    
+    if tabla[7][7] != maksimizer and tabla[7][7] != minimizer:
+        if tabla[6][7] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[6][7] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[6][6] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[6][6] == minimizer:
+            minimizerBlizinaUglova += 1
+        if tabla[7][6] == maksimizer:
+            maksimizerBlizinaUglova += 1
+        elif tabla[7][6] == minimizer:
+            minimizerBlizinaUglova += 1
+
+    blizinaUglova = -12.5 * (maksimizerBlizinaUglova - minimizerBlizinaUglova)
+    
+    
+
     
     #Mobilnost
     brojMogucihPotezaMaksimizer = len(tablaMogucihPotezaMaksimizer)
@@ -84,8 +144,9 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
         mobilnost = 0
 
 
-    return 10 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet
-
+    return 10 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet + 382.026 * blizinaUglova
+    # return 10 * razlikaZetona + 801.724 * uglovi + 10 * kvalitet + 382.026 * blizinaUglova
+    # return 10* razlikaZetona +  801.724 * uglovi
 
 if __name__ == "__main__":
     pass
