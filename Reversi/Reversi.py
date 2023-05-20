@@ -29,6 +29,8 @@ class Reversi(object):
         self._tablaMogucihPoteza = {}
 
         self._sracunateHeuristike = {}
+
+        self._varijabilnaDubina = 3.6
         
     
     def prikazTable(self):
@@ -295,8 +297,8 @@ class Reversi(object):
             kraj = self.isKraj(tabla, self._bot)
         else:
             kraj = self.isKraj(tabla, self._igrac)
-        # if dubina == 0 or kraj or (time.time() - vreme) >= 3.5:
-        if dubina == 0 or kraj:
+        if dubina == 0 or kraj or (time.time() - vreme) >= self._varijabilnaDubina:
+        # if dubina == 0 or kraj:
             hashTable = str(tabla)
             if hashTable in self._sracunateHeuristike:
                 return (self._sracunateHeuristike[hashTable])
@@ -398,9 +400,13 @@ class Reversi(object):
         moguciPoteziBotaLista = []
         vrednostiPoteza = []
         trenutnaTabla = copy.deepcopy(self._tabla)
+        vremeStart = time.time()
         for (i, j) in moguciPoteziBota:
+            timeDelta = time.time()-vremeStart
+            if (timeDelta) >= self._varijabilnaDubina:
+                break
             moguciPoteziBotaLista.append((i,j))
-            vrednostPoteza = self.minmax(trenutnaTabla, 4, True, -math.inf, math.inf, time.time())
+            vrednostPoteza = self.minmax(trenutnaTabla, 4, True, -math.inf, math.inf, vremeStart)
             vrednostiPoteza.append(vrednostPoteza)
         najboljiPotez = moguciPoteziBotaLista[vrednostiPoteza.index(max(vrednostiPoteza))]
 
