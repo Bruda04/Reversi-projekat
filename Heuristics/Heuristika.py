@@ -23,6 +23,15 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
         [20, -3, 11, 8, 8, 11, -3, 20]
     ]
 
+    # kvalitetPolja = [[100, -20, 10, 5, 5, 10, -20, 100],
+    #                 [-20, -50, -2, -2, -2, -2, -50, -20],
+    #                 [10, -2, -1, -1, -1, -1, -2, 10],
+    #                 [5, -2, -1, -1, -1, -1, -2, 5],
+    #                 [5, -2, -1, -1, -1, -1, -2, 5],
+    #                 [10, -2, -1, -1, -1, -1, -2, 10],
+    #                 [-20, -50, -2, -2, -2, -2, -50, -20],
+    #                 [100, -20, 10, 5, 5, 10, -20, 100]]
+
     for i in range(8):
          for j in range(8):
             if tabla[i][j] == maksimizer:
@@ -133,7 +142,7 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
     
 
     
-    #Mobilnost
+    # Mobilnost
     brojMogucihPotezaMaksimizer = len(tablaMogucihPotezaMaksimizer)
     brojMogucihPotezaMinimizer = len(tablaMogucihPotezaMinimizer)
     if brojMogucihPotezaMaksimizer > brojMogucihPotezaMinimizer:
