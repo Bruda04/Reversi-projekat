@@ -33,12 +33,13 @@ class Reversi(object):
         self._varijabilnaDubina = 3.7
         
     
-    def prikazTable(self):
+    def prikazTable(self, clear):
         boje = [None, "⬛", "⬜"]
-        # if os.name == "nt":
-        #     os.system("cls")
-        # else:
-        #     os.system("clear")
+        if clear:
+            if os.name == "nt":
+                os.system("cls")
+            else:
+                os.system("clear")
         print()
         print(f"Igrac {boje[self._igrac]}: {self._igracScore}")
         print(f"Bot {boje[self._bot]}: {self._botScore}")
@@ -280,10 +281,12 @@ class Reversi(object):
 
         if koIgra == self._bot:
             if len(moguciPoteziBota) == 0:
+                return True
                 if len(moguciPoteziIgraca) == 0:
                     return True
         else:
             if len(moguciPoteziIgraca) == 0:
+                return True
                 if len(moguciPoteziBota) == 0:
                     return True
         return False
@@ -291,10 +294,12 @@ class Reversi(object):
     def isKrajIgre(self, moguciPoteziBota, moguciPoteziIgraca, koIgra):
         if koIgra == self._bot:
             if len(moguciPoteziBota) == 0:
+                return True
                 if len(moguciPoteziIgraca) == 0:
                     return True
         else:
             if len(moguciPoteziIgraca) == 0:
+                return True
                 if len(moguciPoteziBota) == 0:
                     return True
         return False
@@ -313,8 +318,8 @@ class Reversi(object):
                 vrednostHeuristike = calculateHeuristics(tabla, self.izracunajMogucePoteze(tabla, self._bot), self.izracunajMogucePoteze(tabla, self._igrac), self._bot, self._igrac)
                 self._sracunateHeuristike[hashTable] = vrednostHeuristike
                 return vrednostHeuristike
-                # vrednostHeuristike = calculateHeuristics(tabla, self.izracunajMogucePoteze(tabla, self._bot), self.izracunajMogucePoteze(tabla, self._igrac), self._bot, self._igrac)
-                # return vrednostHeuristike
+            
+
         
         if igraBot:
             maximalanaEvaluacija = -math.inf
@@ -341,29 +346,42 @@ class Reversi(object):
                 if beta <= alpha:
                     break
             return minimalnaEvaluacija
+        
+    def proglasiPobednika(self):
+        if self._botScore > self._igracScore:
+                print("BOT JE POBEDIO")
+        elif self._botScore < self._igracScore:
+            print("IGRAC JE POBEDIO")
+        else:
+                print("NERESENO")
 
     def igracPotez(self):
+        if self._kraj:
+            return
         self.azurirajMogucePotezeIgraca()
 
         kraj = self.isKrajIgre(self.izracunajMogucePoteze(self._tabla, self._bot), self._tablaMogucihPoteza, self._igrac)
-        if len(self._tablaMogucihPoteza) == 0 and not kraj:
-            return
+        # if len(self._tablaMogucihPoteza) == 0 and not kraj:
+        #     return
         
         if kraj:
             self._kraj = True
             self._tablaMogucihPoteza = {}
-            self.prikazTable()
-            if self._botScore > self._igracScore:
-                print("BOT JE POBEDIO")
-            elif self._botScore < self._igracScore:
-                print("IGRAC JE POBEDIO")
-            else:
-                print("NERESENO")
+            self.prikazTable(False)
+            print()
+            self.proglasiPobednika()
+
+        #     if self._botScore > self._igracScore:
+        #         print("BOT JE POBEDIO")
+        #     elif self._botScore < self._igracScore:
+        #         print("IGRAC JE POBEDIO")
+        #     else:
+        #         print("NERESENO")
 
             return
         
 
-        self.prikazTable()
+        self.prikazTable(False)
         ponudaPoteza = []
         print("Ponudjeni potezi:")
         indexPoteza = 0
@@ -389,27 +407,30 @@ class Reversi(object):
 
     
     def botPotez(self):
+        if self._kraj:
+            return
         moguciPoteziBota = self.izracunajMogucePoteze(self._tabla, self._bot)
         brojPoteza = len(moguciPoteziBota)
         kraj = self.isKrajIgre(moguciPoteziBota, self.izracunajMogucePoteze(self._tabla, self._igrac), self._bot)
 
-        if len(moguciPoteziBota) == 0 and not kraj:
-            return
+        # if len(moguciPoteziBota) == 0 and not kraj:
+        #     return
     
         if kraj:
             self._kraj = True
             self._tablaMogucihPoteza = {}
-            self.prikazTable()
-            if self._botScore > self._igracScore:
-                print("BOT JE POBEDIO")
-            elif self._botScore < self._igracScore:
-                print("IGRAC JE POBEDIO")
-            else:
-                print("NERESENO")
+            self.prikazTable(False)
+            self.proglasiPobednika()
+            # if self._botScore > self._igracScore:
+            #     print("BOT JE POBEDIO")
+            # elif self._botScore < self._igracScore:
+            #     print("IGRAC JE POBEDIO")
+            # else:
+            #     print("NERESENO")
 
             return
         self._tablaMogucihPoteza = moguciPoteziBota
-        self.prikazTable()
+        self.prikazTable(False)
         moguciPoteziBotaLista = []
         vrednostiPoteza = []
         vremeStart = time.time()
@@ -433,6 +454,45 @@ class Reversi(object):
         self._botScore += 1 + len(zaObrtanje)
         self._igracScore -= len(zaObrtanje)
 
+    def igracBot(self):
+        if self._kraj:
+            return
+        moguciPoteziIgracaBota = self.izracunajMogucePoteze(self._tabla, self._bot)
+        kraj = self.isKrajIgre(moguciPoteziIgracaBota, self.izracunajMogucePoteze(self._tabla, self._igrac), self._bot)
+
+        kraj = self.isKraj(self._tabla, self._bot)  
+        
+        if kraj:
+            self._kraj = True
+            self._tablaMogucihPoteza = {}
+            self.prikazTable(False)
+            self.proglasiPobednika()
+        
+
+        self._tablaMogucihPoteza = self.izracunajMogucePoteze(self._tabla, self._bot)
+        self.prikazTable(False)
+        ponudaPoteza = []
+        print("Ponudjeni potezi:")
+        indexPoteza = 0
+        for potez in moguciPoteziIgracaBota:
+            indexPoteza += 1
+            ponudaPoteza.append(potez)
+            print(f"{indexPoteza}. {potez[0] + 1}{chr(potez[1] + 65)} - obrnuce {len(moguciPoteziIgracaBota[potez])}")
+
+        validanUnos = False
+        while not validanUnos:
+            unos = int(input("Unesite zeljeni potez: ")) - 1
+            if unos >= 0 and unos < len(ponudaPoteza):
+                validanUnos = True
+            else:
+                print("Niste uneli validnu opciju!")
+        odabraniPotez = ponudaPoteza[unos]
+        trenutnaTabla = copy.deepcopy(self._tabla)
+        zaObrtanje = moguciPoteziIgracaBota[odabraniPotez]
+        self._tabla = self.postaviBota(trenutnaTabla, odabraniPotez[0], odabraniPotez[1], zaObrtanje)
+        self._botScore +=1 + len(zaObrtanje)
+        self._igracScore -= len(zaObrtanje)
+
     def igrajProtivBota(self):
         if self._igrac == 1:
             while self._kraj != True:
@@ -443,51 +503,16 @@ class Reversi(object):
                 self.botPotez()
                 self.igracPotez()
 
+    def igrajProtivIgraca(self):
+        if self._igrac == 1:
+            while self._kraj != True:
+                self.igracPotez()
+                self.igracBot()
+        elif self._bot == 1:
+            while self._kraj != True:
+                self.igracBot()
+                self.igracPotez()
 
 
 if __name__ == "__main__":
     print("POKRENITE main.py FILE")
-
-    # def igracBot(self):
-    #     self._tablaMogucihPoteza = self.izracunajMogucePoteze(self._tabla, self._bot)
-    #     moguciPoteziIgracaBota = self.izracunajMogucePoteze(self._tabla, self._bot)
-
-    #   kraj = self.isKraj(self._tabla, self._bot)  
-    #     if len(moguciPoteziIgracaBota) == 0 and not kraj:
-    #         return
-        
-    #     if kraj:
-    #         self._kraj = True
-    #         self.prikazTable()
-    #         if self._botScore > self._igracScore:
-    #             print("BOT JE POBEDIO")
-    #         elif self._botScore < self._igracScore:
-    #             print("IGRAC JE POBEDIO")
-    #         else:
-    #             print("NERESENO")
-
-    #         return
-        
-
-    #     self.prikazTable()
-    #     ponudaPoteza = []
-    #     print("Ponudjeni potezi:")
-    #     indexPoteza = 0
-    #     for potez in moguciPoteziIgracaBota:
-    #         indexPoteza += 1
-    #         ponudaPoteza.append(potez)
-    #         print(f"{indexPoteza}. {potez[0] + 1}{chr(potez[1] + 65)} - obrnuce {len(moguciPoteziIgracaBota[potez])}")
-
-    #     validanUnos = False
-    #     while not validanUnos:
-    #         unos = int(input("Unesite zeljeni potez: ")) - 1
-    #         if unos >= 0 and unos < len(ponudaPoteza):
-    #             validanUnos = True
-    #         else:
-    #             print("Niste uneli validnu opciju!")
-    #     odabraniPotez = ponudaPoteza[unos]
-    #     trenutnaTabla = copy.deepcopy(self._tabla)
-    #     zaObrtanje = moguciPoteziIgracaBota[odabraniPotez]
-    #     self._tabla = self.postaviBota(trenutnaTabla, odabraniPotez[0], odabraniPotez[1], zaObrtanje)
-    #     self._botScore +=1 + len(zaObrtanje)
-    #     self._igracScore -= len(zaObrtanje)
