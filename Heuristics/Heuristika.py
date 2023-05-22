@@ -154,7 +154,7 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
 
 
     # return 10 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet + 382.026 * blizinaUglova
-    return 1000 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet + 382.026 * blizinaUglova
+    return 10 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet + 382.026 * blizinaUglova
     # return 10 * razlikaZetona + 801.724 * uglovi + 10 * kvalitet + 382.026 * blizinaUglova
     # return 10* razlikaZetona +  801.724 * uglovi
 

@@ -30,7 +30,7 @@ class Reversi(object):
 
         self._sracunateHeuristike = {}
 
-        self._varijabilnaDubina = 3.7
+        self._varijabilnaDubina = 3.5
         
     
     def prikazTable(self, clear):
@@ -359,17 +359,31 @@ class Reversi(object):
         if self._kraj:
             return
         self.azurirajMogucePotezeIgraca()
-
-        kraj = self.isKrajIgre(self.izracunajMogucePoteze(self._tabla, self._bot), self._tablaMogucihPoteza, self._igrac)
+        moguciPoteziBota = self.izracunajMogucePoteze(self._tabla, self._bot)
+        kraj = self.isKrajIgre(moguciPoteziBota, self._tablaMogucihPoteza, self._igrac)
+        krajProtivnik = self.isKrajIgre(moguciPoteziBota, self._tablaMogucihPoteza, self._bot)
         # if len(self._tablaMogucihPoteza) == 0 and not kraj:
         #     return
         
         if kraj:
-            self._kraj = True
-            self._tablaMogucihPoteza = {}
-            self.prikazTable(False)
-            print()
-            self.proglasiPobednika()
+            if not krajProtivnik:
+                self._kraj = True
+                self._tablaMogucihPoteza = {}
+                self.prikazTable(False)
+                print()
+                # self.proglasiPobednika()
+                print("BOT JE POBEDIO")
+            else:
+                self._kraj = True
+                self._tablaMogucihPoteza = {}
+                self.prikazTable(False)
+
+                if self._botScore > self._igracScore:
+                        print("BOT JE POBEDIO")
+                elif self._botScore < self._igracScore:
+                    print("IGRAC JE POBEDIO")
+                else:
+                    print("NERESENO")
 
         #     if self._botScore > self._igracScore:
         #         print("BOT JE POBEDIO")
@@ -410,17 +424,27 @@ class Reversi(object):
         if self._kraj:
             return
         moguciPoteziBota = self.izracunajMogucePoteze(self._tabla, self._bot)
+        moguciPoteziIgraca =  self.izracunajMogucePoteze(self._tabla, self._igrac)
         brojPoteza = len(moguciPoteziBota)
-        kraj = self.isKrajIgre(moguciPoteziBota, self.izracunajMogucePoteze(self._tabla, self._igrac), self._bot)
+        kraj = self.isKrajIgre(moguciPoteziBota, moguciPoteziIgraca, self._bot)
+        krajProtivnik = self.isKrajIgre(moguciPoteziBota, moguciPoteziIgraca, self._bot)
 
         # if len(moguciPoteziBota) == 0 and not kraj:
         #     return
     
         if kraj:
-            self._kraj = True
-            self._tablaMogucihPoteza = {}
-            self.prikazTable(False)
-            self.proglasiPobednika()
+            if not krajProtivnik:
+                self._kraj = True
+                self._tablaMogucihPoteza = {}
+                self.prikazTable(False)
+                print("IGRAC JE POBEDIO")
+                # self.proglasiPobednika()
+            else:
+                self._kraj = True
+                self._tablaMogucihPoteza = {}
+                self.prikazTable(False)
+
+                self.proglasiPobednika()
             # if self._botScore > self._igracScore:
             #     print("BOT JE POBEDIO")
             # elif self._botScore < self._igracScore:
