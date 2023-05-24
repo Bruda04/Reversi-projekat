@@ -1,3 +1,4 @@
+import math
 def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaMinimizer, maksimizer, minimizer):
     maksimizerZetoni = 0
     minimizerZetoni = 0
@@ -23,15 +24,30 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
         [20, -3, 11, 8, 8, 11, -3, 20]
     ]
 
-    # kvalitetPolja = [[100, -20, 10, 5, 5, 10, -20, 100],
-    #                 [-20, -50, -2, -2, -2, -2, -50, -20],
-    #                 [10, -2, -1, -1, -1, -1, -2, 10],
-    #                 [5, -2, -1, -1, -1, -1, -2, 5],
-    #                 [5, -2, -1, -1, -1, -1, -2, 5],
-    #                 [10, -2, -1, -1, -1, -1, -2, 10],
-    #                 [-20, -50, -2, -2, -2, -2, -50, -20],
-    #                 [100, -20, 10, 5, 5, 10, -20, 100]]
 
+    # Mobilnost
+    brojMogucihPotezaMaksimizer = len(tablaMogucihPotezaMaksimizer)
+    brojMogucihPotezaMinimizer = len(tablaMogucihPotezaMinimizer)
+    if brojMogucihPotezaMaksimizer > brojMogucihPotezaMinimizer:
+        mobilnost = (100 * brojMogucihPotezaMaksimizer) / (brojMogucihPotezaMaksimizer + brojMogucihPotezaMinimizer)
+    elif brojMogucihPotezaMinimizer > brojMogucihPotezaMaksimizer:
+        mobilnost = -(100* brojMogucihPotezaMinimizer) / (brojMogucihPotezaMaksimizer + brojMogucihPotezaMinimizer)
+    else:
+        mobilnost = 0
+
+    if  brojMogucihPotezaMaksimizer == 0 and brojMogucihPotezaMinimizer != 0:
+        return -math.inf 
+    elif brojMogucihPotezaMinimizer == 0 and brojMogucihPotezaMaksimizer != 0:
+        return math.inf
+    elif brojMogucihPotezaMaksimizer == 0 and brojMogucihPotezaMinimizer == 0:
+        if maksimizerZetoni >  minimizerZetoni:
+            return math.inf
+        elif minimizerZetoni > maksimizerZetoni:
+            return -math.inf
+        else:
+            return 0
+        
+        
     for i in range(8):
          for j in range(8):
             if tabla[i][j] == maksimizer:
@@ -142,19 +158,8 @@ def calculateHeuristics(tabla, tablaMogucihPotezaMaksimizer, tablaMogucihPotezaM
     
 
     
-    # Mobilnost
-    brojMogucihPotezaMaksimizer = len(tablaMogucihPotezaMaksimizer)
-    brojMogucihPotezaMinimizer = len(tablaMogucihPotezaMinimizer)
-    if brojMogucihPotezaMaksimizer > brojMogucihPotezaMinimizer:
-        mobilnost = (100 * brojMogucihPotezaMaksimizer) / (brojMogucihPotezaMaksimizer + brojMogucihPotezaMinimizer)
-    elif brojMogucihPotezaMinimizer > brojMogucihPotezaMaksimizer:
-        mobilnost = -(100* brojMogucihPotezaMinimizer) / (brojMogucihPotezaMaksimizer + brojMogucihPotezaMinimizer)
-    else:
-        mobilnost = 0
-
-
     # return 10 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet + 382.026 * blizinaUglova
-    return 10 * razlikaZetona + 801.724 * uglovi + 78.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet + 382.026 * blizinaUglova
+    return 100 * razlikaZetona + 801.724 * uglovi + 178.922 * mobilnost + 74.396 * stabilnost + 10 * kvalitet + 382.026 * blizinaUglova
     # return 10 * razlikaZetona + 801.724 * uglovi + 10 * kvalitet + 382.026 * blizinaUglova
     # return 10* razlikaZetona +  801.724 * uglovi
 
